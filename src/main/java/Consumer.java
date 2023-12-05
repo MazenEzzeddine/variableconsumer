@@ -40,7 +40,7 @@ public class Consumer {
 
     //static LogNormalDistribution dist = new LogNormalDistribution(1.6, 0.3);
 
-   // static ParetoDistribution dist = new ParetoDistribution(3, 2.75);
+    static ParetoDistribution dist = new ParetoDistribution(3, 2.75);
 
 
     //static ParetoDistribution dist = new ParetoDistribution(1.2, 1.3);
@@ -53,7 +53,7 @@ public class Consumer {
 
 
 
-    static NormalDistribution dist = new NormalDistribution(5, 0.75);
+    //static NormalDistribution dist = new NormalDistribution(5, 0.75);
 
 
 
@@ -104,8 +104,8 @@ public class Consumer {
                                 log.info("sleep is {}", sleep);
                                 log.info(" long sleep  {}", (long)sleep);
 
-                               // Thread.sleep((long)sleep);
-                                Thread.sleep(5);
+                                Thread.sleep((long)sleep);
+                               // Thread.sleep(5);
 
 
                                 PrometheusUtils.processingTime
