@@ -1,10 +1,6 @@
-import org.apache.commons.math3.distribution.ExponentialDistribution;
-import org.apache.commons.math3.distribution.LogNormalDistribution;
-import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.ParetoDistribution;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.logging.log4j.LogManager;
@@ -18,8 +14,8 @@ import java.util.Collections;
 import java.util.Properties;
 
 
-public class Consumer {
-    private static final Logger log = LogManager.getLogger(Consumer.class);
+public class ConsumerMain {
+    private static final Logger log = LogManager.getLogger(ConsumerMain.class);
     public static KafkaConsumer<String, Customer> consumer = null;
     static double eventsViolating = 0;
     static double eventsNonViolating = 0;
@@ -31,6 +27,10 @@ public class Consumer {
 
     static ArrayList<TopicPartition> tps;
     static KafkaProducer<String, Customer> producer;
+
+
+    static Double maxConsumptionRatePerConsumer1 = 0.0d;
+    //Long[] waitingTimes = new Long[10];
 
     //static NormalDistribution dist = new NormalDistribution(0.25, 0.025);
 
@@ -57,7 +57,7 @@ public class Consumer {
 
 
 
-    public Consumer() throws
+    public ConsumerMain() throws
             IOException, URISyntaxException, InterruptedException {
     }
 
