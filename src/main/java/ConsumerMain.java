@@ -92,6 +92,8 @@ public class ConsumerMain {
                 if (records.count() != 0) {
 
                         for (ConsumerRecord<String, Customer> record : records) {
+
+                            //
                             totalEvents++;
                             //TODO sleep per record or per batch
                             try {
@@ -120,6 +122,10 @@ public class ConsumerMain {
                                 }
                                 //log.info("processing time : {}", processingTime);
                                 log.info(" latency is {}", System.currentTimeMillis() - record.timestamp());
+
+                               // record.timestamp(), System.currentTimeMillis();
+
+
 
 
                             } catch (InterruptedException e) {
