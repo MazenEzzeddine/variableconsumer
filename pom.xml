@@ -156,7 +156,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>Consumer</mainClass>
+                                    <mainClass>ConsumerMain</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
