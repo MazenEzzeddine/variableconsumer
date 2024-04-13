@@ -60,19 +60,19 @@ public class ConsumerMain {
     public static void main(String[] args)
             throws IOException, URISyntaxException, InterruptedException {
 
-        Thread.sleep(4000);
+        //Thread.sleep(4000);
         PrometheusUtils.initPrometheus();
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaConsumerConfig.createProperties(config);
 
-        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                StickyAssignor.class.getName());
+/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+                StickyAssignor.class.getName());*/
 
 
 
-//        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-//               BinPackPartitionAssignor.class.getName());
+   props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+              BinPackPartitionAssignor.class.getName());
 
        // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         consumer = new KafkaConsumer<String, Customer>(props);
@@ -100,7 +100,7 @@ public class ConsumerMain {
                             //TODO sleep per record or per batch
                             try {
 
-                                double sleep = dist.sample();
+                                double sleep = 5;//dist.sample();
                                 if (max< sleep) {
                                     max=sleep;
                                 }
