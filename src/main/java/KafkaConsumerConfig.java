@@ -57,7 +57,7 @@ public class KafkaConsumerConfig {
             props.put(ConsumerConfig.CLIENT_RACK_CONFIG, config.getClientRack());
         }
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, config.getAutoOffsetReset());
-        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 500);
+        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 200);
 
   /*      props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG,
                 Collections.singletonList(CountConsumerInterceptor.class));*/

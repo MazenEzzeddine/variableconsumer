@@ -84,6 +84,8 @@ public class ConsumerMain {
 
         double max=0;
 
+        double sumProcessing=0;
+
 
 
         try {
@@ -109,6 +111,10 @@ public class ConsumerMain {
                                 log.info(" long sleep  {}", (long)sleep);
 
                                 Thread.sleep((long)sleep);
+
+
+                                sumProcessing += sleep;
+
                                // Thread.sleep(5);
 
 
@@ -136,8 +142,15 @@ public class ConsumerMain {
                         }
                     }
 
+
+
+
                 PrometheusUtils.processingTime
                         .setDuration(max);
+
+
+                PrometheusUtils.processingTime
+                        .setDuration(sumProcessing/records.count());
                 max=0;
                     consumer.commitSync();
                     log.info("In this poll, received {} events", records.count());
