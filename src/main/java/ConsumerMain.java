@@ -1,7 +1,8 @@
 import org.apache.commons.math3.distribution.ParetoDistribution;
-import org.apache.kafka.clients.consumer.*;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -22,15 +22,13 @@ public class ConsumerMain {
     static double totalEvents = 0;
 
 
-
-
     static Double maxConsumptionRatePerConsumer1 = 0.0d;
     //Long[] waitingTimes = new Long[10];
 
     //static NormalDistribution dist = new NormalDistribution(0.25, 0.025);
 
 
-   // static ExponentialDistribution dist = new ExponentialDistribution(5/*0.2*/);
+    // static ExponentialDistribution dist = new ExponentialDistribution(5/*0.2*/);
 
 
     //static LogNormalDistribution dist = new LogNormalDistribution(1.6, 0.3);
@@ -40,16 +38,13 @@ public class ConsumerMain {
 
     //static ParetoDistribution dist = new ParetoDistribution(1.2, 1.3);
 
-   // static ParetoDistribution dist = new ParetoDistribution(3, 2);
+    // static ParetoDistribution dist = new ParetoDistribution(3, 2);
 
 
     //static ParetoDistribution dist = new ParetoDistribution(2, 2.1);
 
 
-
-
     //static NormalDistribution dist = new NormalDistribution(5, 0.75);
-
 
 
     public ConsumerMain() throws
@@ -70,81 +65,62 @@ public class ConsumerMain {
                 StickyAssignor.class.getName());*/
 
 
+        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+                BinPackPartitionAssignor.class.getName());
 
-   props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-              BinPackPartitionAssignor.class.getName());
-
-       // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
+        // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         consumer = new KafkaConsumer<String, Customer>(props);
         consumer.subscribe(Collections.singletonList(config.getTopic())/*, new RebalanceListener()*/);
         log.info("Subscribed to topic {}", config.getTopic());
 
         addShutDownHook();
-
-
-        double max=0;
-
-        double sumProcessing=0;
-
-
-
+        double sumProcessing = 0;
         try {
             while (true) {
                 ConsumerRecords<String, Customer> records = consumer.poll
                         (Duration.ofMillis(Long.MAX_VALUE));
-
                 if (records.count() != 0) {
-                        for (ConsumerRecord<String, Customer> record : records) {
-                            //
-                            totalEvents++;
-                            //TODO sleep per record or per batch
-                            try {
-                                double sleep = 5;//dist.sample();
-                               /* if (max< sleep) {
-                                    max=sleep;
-                                }*/
-                                log.info("sleep is {}", sleep);
-                                log.info(" long sleep  {}", (long)sleep);
-                                Thread.sleep((long)sleep);
+                    for (ConsumerRecord<String, Customer> record : records) {
+                        //
+                        totalEvents++;
+                        //TODO sleep per record or per batch
+                        try {
+                            double sleep = 5;
+                            //dist.sample();
+
+                            log.info("sleep is {}", sleep);
+                            log.info(" long sleep  {}", (long) sleep);
+                            Thread.sleep((long) sleep);
 
 
-                                sumProcessing += sleep;
+                            sumProcessing += sleep;
                          /*       PrometheusUtils.processingTime
                                         .setDuration(sleep);*/
-                                PrometheusUtils.totalLatencyTime
-                                        .setDuration(System.currentTimeMillis() - record.timestamp());
+                            PrometheusUtils.totalLatencyTime
+                                    .setDuration(System.currentTimeMillis() - record.timestamp());
 
-                                if (System.currentTimeMillis() - record.timestamp() <= 500 /*1500*/) {
-                                    eventsNonViolating++;
-                                } else {
-                                    eventsViolating++;
-                                }
-                                //log.info("processing time : {}", processingTime);
-                                log.info(" latency is {}", System.currentTimeMillis() - record.timestamp());
-
-                               // record.timestamp(), System.currentTimeMillis();
-
-
-
-
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
+                            if (System.currentTimeMillis() - record.timestamp() <= 500 /*1500*/) {
+                                eventsNonViolating++;
+                            } else {
+                                eventsViolating++;
                             }
+                            //log.info("processing time : {}", processingTime);
+                            log.info(" latency is {}", System.currentTimeMillis() - record.timestamp());
+                            // record.timestamp(), System.currentTimeMillis();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
                     }
+                }
 
-
-
-
-        /*        PrometheusUtils.processingTime
+        /* PrometheusUtils.processingTime
                         .setDuration(max);*/
-
-
                 PrometheusUtils.processingTime
-                        .setDuration(sumProcessing/records.count());
-                max=0;
-                    consumer.commitSync();
-                    log.info("In this poll, received {} events", records.count());
+                        .setDuration(sumProcessing / records.count());
+                sumProcessing = 0;
+
+                consumer.commitSync();
+                log.info("In this poll, received {} events", records.count());
 
                   /*  Long timeAfterPollingProcessingAndCommit = System.currentTimeMillis();
                     ConsumptionRatePerConsumerInThisPoll = ((float) records.count() /
@@ -165,9 +141,8 @@ public class ConsumerMain {
                     log.info("Percent violating so far {}", percentViolating);
                     log.info("Percent non violating so far {}", percentNonViolating);
                     log.info("total events {}", totalEvents);*/
-                }
             }
-         catch (WakeupException e) {
+        } catch (WakeupException e) {
             // e.printStackTrace();
         } finally {
             consumer.close();
