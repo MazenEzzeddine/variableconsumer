@@ -94,32 +94,23 @@ public class ConsumerMain {
                         (Duration.ofMillis(Long.MAX_VALUE));
 
                 if (records.count() != 0) {
-
                         for (ConsumerRecord<String, Customer> record : records) {
-
                             //
                             totalEvents++;
                             //TODO sleep per record or per batch
                             try {
-
                                 double sleep = 5;//dist.sample();
-                                if (max< sleep) {
+                               /* if (max< sleep) {
                                     max=sleep;
-                                }
-
+                                }*/
                                 log.info("sleep is {}", sleep);
                                 log.info(" long sleep  {}", (long)sleep);
-
                                 Thread.sleep((long)sleep);
 
 
                                 sumProcessing += sleep;
-
-                               // Thread.sleep(5);
-
-
-                                PrometheusUtils.processingTime
-                                        .setDuration(sleep);
+                         /*       PrometheusUtils.processingTime
+                                        .setDuration(sleep);*/
                                 PrometheusUtils.totalLatencyTime
                                         .setDuration(System.currentTimeMillis() - record.timestamp());
 
@@ -145,8 +136,8 @@ public class ConsumerMain {
 
 
 
-                PrometheusUtils.processingTime
-                        .setDuration(max);
+        /*        PrometheusUtils.processingTime
+                        .setDuration(max);*/
 
 
                 PrometheusUtils.processingTime
