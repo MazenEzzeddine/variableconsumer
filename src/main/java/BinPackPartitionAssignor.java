@@ -202,6 +202,9 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
             return;
         }
 
+
+        //TODO: check if the controller nb of consumers, and that of are equal...
+
         for(String c: consumers) {
             LOGGER.info("We have the following consumers  out of Kafka {}", c);
         }

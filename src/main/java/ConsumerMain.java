@@ -1,8 +1,6 @@
+import io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics;
 import org.apache.commons.math3.distribution.ParetoDistribution;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,16 +59,22 @@ public class ConsumerMain {
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaConsumerConfig.createProperties(config);
 
-/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                StickyAssignor.class.getName());*/
-
-
         props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                BinPackPartitionAssignor.class.getName());
+                StickyAssignor.class.getName());
+
+
+
+/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+                BinPackPartitionAssignor.class.getName());*/
 
         // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         consumer = new KafkaConsumer<String, Customer>(props);
         consumer.subscribe(Collections.singletonList(config.getTopic())/*, new RebalanceListener()*/);
+
+        KafkaClientMetrics consumerKafkaMetrics = new KafkaClientMetrics(consumer);
+        consumerKafkaMetrics.bindTo(PrometheusUtils.prometheusRegistry);
+
+
         log.info("Subscribed to topic {}", config.getTopic());
 
         addShutDownHook();
@@ -86,13 +90,11 @@ public class ConsumerMain {
                         //TODO sleep per record or per batch
                         try {
                             double sleep = 5;
-                            //dist.sample();
+                        //   double sleep=  dist.sample();
 
                             log.info("sleep is {}", sleep);
                             log.info(" long sleep  {}", (long) sleep);
                             Thread.sleep((long) sleep);
-
-
                             sumProcessing += sleep;
                          /*       PrometheusUtils.processingTime
                                         .setDuration(sleep);*/
