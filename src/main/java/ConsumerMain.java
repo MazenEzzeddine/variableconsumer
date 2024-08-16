@@ -31,7 +31,14 @@ public class ConsumerMain {
 
     //static LogNormalDistribution dist = new LogNormalDistribution(1.6, 0.3);
 
-    static ParetoDistribution dist = new ParetoDistribution(3, 2.75);
+   // static ParetoDistribution dist = new ParetoDistribution(3, 2.75);
+    //static ParetoDistribution dist = new ParetoDistribution(3, 2.5);
+
+    static ParetoDistribution dist = new ParetoDistribution(2.5, 2);
+
+
+    //static ParetoDistribution dist = new ParetoDistribution(2, 2);
+
 
 
     //static ParetoDistribution dist = new ParetoDistribution(1.2, 1.3);
@@ -89,8 +96,8 @@ public class ConsumerMain {
                         totalEvents++;
                         //TODO sleep per record or per batch
                         try {
-                            double sleep = 5;
-                        //   double sleep=  dist.sample();
+                           // double sleep = 5;
+                           double sleep=  dist.sample();
 
                             log.info("sleep is {}", sleep);
                             log.info(" long sleep  {}", (long) sleep);
@@ -119,6 +126,8 @@ public class ConsumerMain {
                         .setDuration(max);*/
                 PrometheusUtils.processingTime
                         .setDuration(sumProcessing / records.count());
+
+                log.info("Average processing latency is {}", sumProcessing / records.count() );
                 sumProcessing = 0;
 
                 consumer.commitSync();
