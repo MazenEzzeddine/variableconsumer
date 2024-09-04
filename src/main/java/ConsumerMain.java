@@ -10,11 +10,14 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 
 public class ConsumerMain {
     private static final Logger log = LogManager.getLogger(ConsumerMain.class);
-    public static KafkaConsumer<String, Customer> consumer = null;
+   //public static KafkaConsumer<String, Customer> consumer = null;
+   public static KafkaConsumer<String, String> consumer = null;
+
     static double eventsViolating = 0;
     static double eventsNonViolating = 0;
     static double totalEvents = 0;
@@ -75,7 +78,8 @@ public class ConsumerMain {
                 BinPackPartitionAssignor.class.getName());*/
 
         // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
-        consumer = new KafkaConsumer<String, Customer>(props);
+        //consumer = new KafkaConsumer<String, Customer>(props);
+        consumer = new KafkaConsumer<String, String>(props);
         consumer.subscribe(Collections.singletonList(config.getTopic())/*, new RebalanceListener()*/);
 
         KafkaClientMetrics consumerKafkaMetrics = new KafkaClientMetrics(consumer);
@@ -88,16 +92,18 @@ public class ConsumerMain {
         double sumProcessing = 0;
         try {
             while (true) {
-                ConsumerRecords<String, Customer> records = consumer.poll
+      /*          ConsumerRecords<String, Customer> records = consumer.poll
+                        (Duration.ofMillis(Long.MAX_VALUE));*/
+                ConsumerRecords<String, String> records = consumer.poll
                         (Duration.ofMillis(Long.MAX_VALUE));
                 if (records.count() != 0) {
-                    for (ConsumerRecord<String, Customer> record : records) {
+                    for (ConsumerRecord<String, String> record : records) { //Customer
                         //
                         totalEvents++;
                         //TODO sleep per record or per batch
                         try {
-                           // double sleep = 5;
-                           double sleep=  dist.sample();
+                            double sleep = 5;
+                           //double sleep=  dist.sample();
 
                             log.info("sleep is {}", sleep);
                             log.info(" long sleep  {}", (long) sleep);
@@ -107,6 +113,8 @@ public class ConsumerMain {
                                         .setDuration(sleep);*/
                             PrometheusUtils.totalLatencyTime
                                     .setDuration(System.currentTimeMillis() - record.timestamp());
+                            PrometheusUtils.distributionSummary.record(sleep);
+                            PrometheusUtils.timer.record((long)sleep, TimeUnit.MILLISECONDS);
 
                             if (System.currentTimeMillis() - record.timestamp() <= 500 /*1500*/) {
                                 eventsNonViolating++;
@@ -126,6 +134,9 @@ public class ConsumerMain {
                         .setDuration(max);*/
                 PrometheusUtils.processingTime
                         .setDuration(sumProcessing / records.count());
+
+
+
 
                 log.info("Average processing latency is {}", sumProcessing / records.count() );
                 sumProcessing = 0;

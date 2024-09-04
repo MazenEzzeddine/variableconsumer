@@ -65,10 +65,10 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, config.getEnableAutoCommit());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 "org.apache.kafka.common.serialization.StringDeserializer");
+/*        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+                CustomerDeserializer.class.getName());*/
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-                CustomerDeserializer.class.getName());
-       // props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-        // "org.apache.kafka.common.serialization.StringDeserializer");
+         "org.apache.kafka.common.serialization.StringDeserializer");
         if (!config.getAdditionalConfig().isEmpty()) {
             StringTokenizer tok = new StringTokenizer(config.getAdditionalConfig(), ", \t\n\r");
             while (tok.hasMoreTokens()) {
