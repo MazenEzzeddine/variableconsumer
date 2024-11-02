@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Collections;
@@ -34,10 +35,10 @@ public class ConsumerMain {
 
     //static LogNormalDistribution dist = new LogNormalDistribution(1.6, 0.3);
 
-   // static ParetoDistribution dist = new ParetoDistribution(3, 2.75);
+    static ParetoDistribution dist = new ParetoDistribution(3, 2.75);
     //static ParetoDistribution dist = new ParetoDistribution(3, 2.5);
 
-    static ParetoDistribution dist = new ParetoDistribution(2.5, 2);
+  //  static ParetoDistribution dist = new ParetoDistribution(2.5, 2); //this
 
 
     //static ParetoDistribution dist = new ParetoDistribution(2, 2);
@@ -68,18 +69,16 @@ public class ConsumerMain {
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaConsumerConfig.createProperties(config);
-
         props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
                 StickyAssignor.class.getName());
 
-
-
-/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+/*
+        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
                 BinPackPartitionAssignor.class.getName());*/
 
         // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         //consumer = new KafkaConsumer<String, Customer>(props);
-        consumer = new KafkaConsumer<String, String>(props);
+        consumer = new KafkaConsumer<>(props);
         consumer.subscribe(Collections.singletonList(config.getTopic())/*, new RebalanceListener()*/);
 
         KafkaClientMetrics consumerKafkaMetrics = new KafkaClientMetrics(consumer);
@@ -102,15 +101,18 @@ public class ConsumerMain {
                         totalEvents++;
                         //TODO sleep per record or per batch
                         try {
-                            double sleep = 5;
-                           //double sleep=  dist.sample();
+                            //double sleep = 5;
+                             double sleep=  dist.sample();
 
                             log.info("sleep is {}", sleep);
                             log.info(" long sleep  {}", (long) sleep);
+
+                            //instead of sleep, call fibo top stress cpu
                             Thread.sleep((long) sleep);
-                            sumProcessing += sleep;
-                         /*       PrometheusUtils.processingTime
-                                        .setDuration(sleep);*/
+                            //fibo(1000);
+                          //  sumProcessing += sleep;
+                                PrometheusUtils.processingTime
+                                        .setDuration(sleep);
                             PrometheusUtils.totalLatencyTime
                                     .setDuration(System.currentTimeMillis() - record.timestamp());
                             PrometheusUtils.distributionSummary.record(sleep);
@@ -172,6 +174,10 @@ public class ConsumerMain {
         }
     }
 
+    static BigDecimal fibo(int n) {
+        if(n==0 || n==1) return new BigDecimal(1);
+        return new BigDecimal(n).multiply(fibo(n-1));
+    }
 
     private static void addShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
