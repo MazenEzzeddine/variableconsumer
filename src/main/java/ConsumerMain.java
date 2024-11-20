@@ -69,12 +69,11 @@ public class ConsumerMain {
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaConsumerConfig.createProperties(config);
-        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                StickyAssignor.class.getName());
+/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+                StickyAssignor.class.getName());*/
 
-/*
         props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                BinPackPartitionAssignor.class.getName());*/
+                BinPackPartitionAssignor.class.getName());
 
         // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         //consumer = new KafkaConsumer<String, Customer>(props);
@@ -101,8 +100,8 @@ public class ConsumerMain {
                         totalEvents++;
                         //TODO sleep per record or per batch
                         try {
-                            //double sleep = 5;
-                             double sleep=  dist.sample();
+                            double sleep = 5;
+                            // double sleep=  dist.sample();
 
                             log.info("sleep is {}", sleep);
                             log.info(" long sleep  {}", (long) sleep);
