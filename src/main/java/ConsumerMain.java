@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ConsumerMain {
     private static final Logger log = LogManager.getLogger(ConsumerMain.class);
-   //public static KafkaConsumer<String, Customer> consumer = null;
-   public static KafkaConsumer<String, String> consumer = null;
+   public static KafkaConsumer<String, Customer> consumer = null;
+  // public static KafkaConsumer<String, String> consumer = null;
 
     static double eventsViolating = 0;
     static double eventsNonViolating = 0;
@@ -69,11 +69,11 @@ public class ConsumerMain {
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaConsumerConfig.createProperties(config);
-/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                StickyAssignor.class.getName());*/
-
         props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                BinPackPartitionAssignor.class.getName());
+                StickyAssignor.class.getName());
+
+ /*       props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+                BinPackPartitionAssignor.class.getName());*/
 
         // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         //consumer = new KafkaConsumer<String, Customer>(props);
@@ -92,10 +92,10 @@ public class ConsumerMain {
             while (true) {
       /*          ConsumerRecords<String, Customer> records = consumer.poll
                         (Duration.ofMillis(Long.MAX_VALUE));*/
-                ConsumerRecords<String, String> records = consumer.poll
+                ConsumerRecords<String, Customer> records = consumer.poll
                         (Duration.ofMillis(Long.MAX_VALUE));
                 if (records.count() != 0) {
-                    for (ConsumerRecord<String, String> record : records) { //Customer
+                    for (ConsumerRecord<String, Customer> record : records) { //Customer
                         //
                         totalEvents++;
                         //TODO sleep per record or per batch
