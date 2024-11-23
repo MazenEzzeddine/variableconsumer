@@ -69,16 +69,16 @@ public class ConsumerMain {
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaConsumerConfig.createProperties(config);
-        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                StickyAssignor.class.getName());
+/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+                StickyAssignor.class.getName());*/
 
- /*       props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                BinPackPartitionAssignor.class.getName());*/
+        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+                BinPackPartitionAssignor.class.getName());
 
         // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         //consumer = new KafkaConsumer<String, Customer>(props);
         consumer = new KafkaConsumer<>(props);
-        consumer.subscribe(Collections.singletonList(config.getTopic())/*, new RebalanceListener()*/);
+        consumer.subscribe(Collections.singletonList(config.getTopic()), new RebalanceListener());
 
         KafkaClientMetrics consumerKafkaMetrics = new KafkaClientMetrics(consumer);
         consumerKafkaMetrics.bindTo(PrometheusUtils.prometheusRegistry);

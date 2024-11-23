@@ -12,7 +12,7 @@ public class RebalanceListener implements ConsumerRebalanceListener {
     public void onPartitionsRevoked(Collection<TopicPartition> collection) {
         try {
             log.info("Sleeping on rebalancing");
-            Thread.sleep(/*10000*/0);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
