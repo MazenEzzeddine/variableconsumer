@@ -56,6 +56,9 @@ public class ConsumerMain {
     //static NormalDistribution dist = new NormalDistribution(5, 0.75);
 
 
+
+
+
     public ConsumerMain() throws
             IOException, URISyntaxException, InterruptedException {
     }
@@ -65,15 +68,18 @@ public class ConsumerMain {
             throws IOException, URISyntaxException, InterruptedException {
 
         //Thread.sleep(4000);
+
+
+
         PrometheusUtils.initPrometheus();
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
         Properties props = KafkaConsumerConfig.createProperties(config);
-/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                StickyAssignor.class.getName());*/
-
         props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
-                BinPackPartitionAssignor.class.getName());
+                StickyAssignor.class.getName());
+
+/*        props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+                BinPackPartitionAssignor.class.getName());*/
 
         // boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         //consumer = new KafkaConsumer<String, Customer>(props);
@@ -88,6 +94,10 @@ public class ConsumerMain {
 
         addShutDownHook();
         double sumProcessing = 0;
+
+
+        DatabaseUtils.loadAndGetConnection();
+        DatabaseUtils.getAllRows();
         try {
             while (true) {
       /*          ConsumerRecords<String, Customer> records = consumer.poll
@@ -99,7 +109,7 @@ public class ConsumerMain {
                         //
                         totalEvents++;
                         //TODO sleep per record or per batch
-                        try {
+                       // try {
                             double sleep = 5;
                             // double sleep=  dist.sample();
 
@@ -107,14 +117,24 @@ public class ConsumerMain {
                             log.info(" long sleep  {}", (long) sleep);
 
                             //instead of sleep, call fibo top stress cpu
-                            Thread.sleep((long) sleep);
+
+                           // Thread.sleep((long) sleep);
+
+                        log.info("key {}", record.value().getID());
+                        log.info("name {}", record.value().getName());
+
+                        long before = System.currentTimeMillis();
+
+                          DatabaseUtils.InsertRow(record.value().getID(), record.value().getName());
                             //fibo(1000);
                           //  sumProcessing += sleep;
-                                PrometheusUtils.processingTime
-                                        .setDuration(sleep);
+                        long after = System.currentTimeMillis();
+
+                        PrometheusUtils.processingTime
+                                        .setDuration(after-before);
                             PrometheusUtils.totalLatencyTime
                                     .setDuration(System.currentTimeMillis() - record.timestamp());
-                            PrometheusUtils.distributionSummary.record(sleep);
+                            PrometheusUtils.distributionSummary.record(after-before);
                             PrometheusUtils.timer.record((long)sleep, TimeUnit.MILLISECONDS);
 
                             if (System.currentTimeMillis() - record.timestamp() <= 500 /*1500*/) {
@@ -125,14 +145,13 @@ public class ConsumerMain {
                             //log.info("processing time : {}", processingTime);
                             log.info(" latency is {}", System.currentTimeMillis() - record.timestamp());
                             // record.timestamp(), System.currentTimeMillis();
-                        } catch (InterruptedException e) {
+                       /* } catch (InterruptedException e) {
                             e.printStackTrace();
-                        }
+                        }*/
                     }
                 }
 
-        /* PrometheusUtils.processingTime
-                        .setDuration(max);*/
+
                 PrometheusUtils.processingTime
                         .setDuration(sumProcessing / records.count());
 

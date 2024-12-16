@@ -1,0 +1,55 @@
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: nginx-disk
+#spec:
+#  accessModes:
+#    - ReadWriteOnce
+#  resources:
+#    requests:
+#      storage: 30Gi
+
+#kind: PersistentVolume
+#apiVersion: v1
+#metadata:
+#  name: models-1-0-0
+#  labels:
+#    name: models-1-0-0
+#spec:
+#  capacity:
+#    storage: 200Gi
+#  storageClassName: standard
+#  accessModes:
+#    - ReadOnlyMany
+#  gcePersistentDisk:
+#    pdName: models-1-0-0
+#    fsType: ext4
+#    readOnly: true
+#---
+#kind: PersistentVolumeClaim
+#apiVersion: v1
+#metadata:
+#  name: models-1-0-0-claim
+#spec:
+#  accessModes:
+#    - ReadOnlyMany
+#  resources:
+#    requests:
+#      storage: 200Gi
+#  selector:
+#    matchLabels:
+#      name: models-1-0-0
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-claim1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 30Gi
+  storageClassName: standard
