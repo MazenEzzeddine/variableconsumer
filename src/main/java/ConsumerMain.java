@@ -135,7 +135,6 @@ public class ConsumerMain {
                             PrometheusUtils.totalLatencyTime
                                     .setDuration(System.currentTimeMillis() - record.timestamp());
                             PrometheusUtils.distributionSummary.record(after-before);
-                            PrometheusUtils.timer.record((long)sleep, TimeUnit.MILLISECONDS);
 
                             if (System.currentTimeMillis() - record.timestamp() <= 500 /*1500*/) {
                                 eventsNonViolating++;
@@ -157,9 +156,9 @@ public class ConsumerMain {
 
 
 
-
+/*
                 log.info("Average processing latency is {}", sumProcessing / records.count() );
-                sumProcessing = 0;
+                sumProcessing = 0;*/
 
                 consumer.commitSync();
                 log.info("In this poll, received {} events", records.count());

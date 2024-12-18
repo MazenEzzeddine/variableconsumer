@@ -231,6 +231,7 @@ public class BinPackPartitionAssignor extends AbstractAssignor {
 
     private static Map<String, List<String>> consumersPerTopic(Map<String, List<String>> subscriptions) {
 
+
         final Map<String, List<String>> consumersPerTopic = new HashMap<>();
         for (Map.Entry<String, List<String>> subscriptionEntry : subscriptions.entrySet()) {
 

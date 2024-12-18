@@ -20,7 +20,6 @@ public class PrometheusUtils {
     public static DistributionSummary distributionSummary;
 
 
-    public static Timer timer;
 
 
 
@@ -58,9 +57,7 @@ public class PrometheusUtils {
                // .serviceLevelObjectives(70, 80, 90)
 
 
-      timer =   Timer.builder("timer_event_latency")
-                //.publishPercentiles(0.5, 0.95) // median and 95th percentile
-                .publishPercentileHistogram().register(prometheusRegistry);
+
 
 
     }
