@@ -1,7 +1,6 @@
 import com.sun.net.httpserver.HttpServer;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Gauge;
-import io.micrometer.core.instrument.Timer;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 
@@ -13,18 +12,10 @@ public class PrometheusUtils {
     public static PrometheusMeterRegistry prometheusRegistry;
     public static TimeMeasure processingTime;
     public static Gauge processingGauge;
-    //public static Timer timer;
     public static TimeMeasure totalLatencyTime;
     public static Gauge totalLatencyGauge;
 
     public static DistributionSummary distributionSummary;
-
-
-
-
-
-
-
 
 
     public static void initPrometheus() {
@@ -44,21 +35,13 @@ public class PrometheusUtils {
         }
 
         processingTime = new TimeMeasure(0.0);
-        processingGauge = Gauge.builder("processingGauge",  processingTime, TimeMeasure::getDuration)
-                .register(prometheusRegistry);//prometheusRegistry.gauge("timergauge" );
+        processingGauge = Gauge.builder("processingGauge", processingTime, TimeMeasure::getDuration).register(prometheusRegistry);
 
         totalLatencyTime = new TimeMeasure(0.0);
-        totalLatencyGauge = Gauge.builder("totallatencygauge",  totalLatencyTime, TimeMeasure::getDuration)
-                .register(prometheusRegistry);//prometheusRegistry.gauge("timergauge" );
+        totalLatencyGauge = Gauge.builder("totallatencygauge", totalLatencyTime, TimeMeasure::getDuration).register(prometheusRegistry);
 
 
-        distributionSummary =   DistributionSummary.builder("events_latency").register(prometheusRegistry);
-                //.scale(100)
-               // .serviceLevelObjectives(70, 80, 90)
-
-
-
-
+        distributionSummary = DistributionSummary.builder("events_latency").register(prometheusRegistry);
 
     }
 }
