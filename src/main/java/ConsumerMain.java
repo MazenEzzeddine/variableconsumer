@@ -142,7 +142,6 @@ public class ConsumerMain {
 
     private static void dblogic() {
         DatabaseUtils.loadAndGetConnection();
-
         try {
             while (true) {
                 ConsumerRecords<String, Customer> records = consumer.poll
