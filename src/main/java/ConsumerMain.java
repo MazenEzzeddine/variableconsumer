@@ -49,11 +49,6 @@ public class ConsumerMain {
     public static void main(String[] args)
             throws IOException, URISyntaxException, InterruptedException {
 
-
-
-
-
-
         PrometheusUtils.initPrometheus();
         KafkaConsumerConfig config = KafkaConsumerConfig.fromEnv();
         log.info(KafkaConsumerConfig.class.getName() + ": {}", config.toString());
